@@ -8,6 +8,14 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    @IBOutlet weak var checkMark: UIButton!
+    @IBOutlet weak var loginButton: UIButton! {
+        didSet {
+            loginButton.layer.cornerRadius = 15
+            loginButton.layer.masksToBounds = true
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
