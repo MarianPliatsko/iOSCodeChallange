@@ -18,10 +18,9 @@ class CalendarCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var dayDateLabel: UILabel!
     
     //MARK: - Nib life cicle
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    
+    override func prepareForReuse() {
+        dayDateLabel.attributedText = nil
     }
     
     //MARK: - Methods

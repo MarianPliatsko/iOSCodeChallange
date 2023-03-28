@@ -23,11 +23,9 @@ final class CalendarViewController: UIViewController {
     @IBOutlet weak var calendarTableView: UITableView!
     
     //MARK: - View life cycle
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        getShedules()
         
         calendarCollectionView.delegate = self
         calendarCollectionView.dataSource  = self
@@ -57,22 +55,6 @@ final class CalendarViewController: UIViewController {
     
     //MARK: - Methods
     
-    func getShedules() {
-        networkService.getEvents { result in
-            switch result {
-            case .success(let shedule):
-                DispatchQueue.main.async {
-                    let event = Shedule(error: nil,
-                                        data: [SheduleData(courseName: "iOS", room: "100", startTime: "\(Date.now)", emdTime: "\(Date.now + 100)")])
-                    self.sheduleEvents = event
-                    self.calendarTableView.reloadData()
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
-    }
-    
     //setup layout for collection view
     func flowLayout() -> UICollectionViewFlowLayout {
         let width = (calendarCollectionView.frame.size.width - 2) / 8
@@ -99,7 +81,7 @@ final class CalendarViewController: UIViewController {
         while count <= 42 {
             let calendarDay = CalendarDay()
             if count <= startingSpaces {
-               let previosMonthDay = daysInPreviousMonth - startingSpaces + count
+                let previosMonthDay = daysInPreviousMonth - startingSpaces + count
                 calendarDay.day = String(previosMonthDay)
                 calendarDay.month = CalendarDay.Month.previous
             } else if count - startingSpaces > daysInMonth {
@@ -149,18 +131,29 @@ extension CalendarViewController: UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        networkService.getEvents { result in
+        guard let calendarDay = totalDaysInMonth[indexPath.item].day else {
+            print("Failure to set calendar day")
+            return
+        }
+        let year = CalendarHelper().yearToString(date: selectedDate)
+        let month = CalendarHelper().monthToStringNumber(date: selectedDate)
+        let isoDate = "\(year)-\(month)-\(calendarDay)T10:44:00+0000"
+        let dateFormatter = ISO8601DateFormatter()
+        let date = dateFormatter.date(from:isoDate) ?? Date()
+        
+        networkService.getEvents(date: date) { result in
             switch result {
-            case .success(let success):
-                print(success)
+            case .success(let events):
+                DispatchQueue.main.async {
+                    self.sheduleEvents = events
+                    self.calendarTableView.reloadData()
+                }
             case .failure(let error):
                 print(error)
             }
         }
-        calendarTableView.reloadData()
     }
 }
-
 //MARK: - extension CalendarViewController: UITableViewDelegate, UITableViewDataSource
 
 extension CalendarViewController: UITableViewDelegate, UITableViewDataSource {

@@ -42,7 +42,7 @@ class StubNetworkService {
                     return
                 }
             }
-            if url.absoluteString.hasSuffix("api/schedule") {
+            if url.absoluteString.contains("api/schedule") {
                 if let data = self.sheduleMineResponse().data(using: .utf8) {
                     complition(.success(data))
                     return
@@ -83,8 +83,8 @@ class StubNetworkService {
         }
     }
     
-    func getEvents(complition: @escaping(Result<Shedule,Error>) -> Void) {
-        let request = makeRequest(for: "api/schedule",
+    func getEvents(date: Date, complition: @escaping(Result<Shedule,Error>) -> Void) {
+        let request = makeRequest(for: "api/schedule?date=\(date.ISO8601Format())",
                                   baseURL: self.baseURL,
                                   method: .get)
         self.request(urlRequest: request) { result in

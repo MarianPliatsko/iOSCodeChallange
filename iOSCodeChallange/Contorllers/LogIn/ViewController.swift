@@ -112,6 +112,7 @@ class ViewController: UIViewController {
         let calendarVC = UIStoryboard(name: "Calendar",
                                       bundle: .main)
             .instantiateViewController(withIdentifier: "CalendarViewController") as! CalendarViewController
+        navigationController?.isNavigationBarHidden = true
         navigationController?.pushViewController(calendarVC, animated: true)
     }
     
