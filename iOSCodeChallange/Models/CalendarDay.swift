@@ -7,9 +7,14 @@
 
 import Foundation
 
-class CalendarDay {
-    var day: String!
-    var month: Month!
+enum DayType {
+    case nonCurrentMonth
+    case currentMonth(isToday: Bool)
+}
+
+struct CalendarDay {
+    var day: String
+    var month: Month
     var event: Shedule?
     
     enum Month {

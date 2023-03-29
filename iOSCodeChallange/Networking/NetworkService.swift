@@ -23,47 +23,6 @@ class StubNetworkService {
     
     private let baseURL = URL(string: "https://some.my.url.com/")!
     
-    func request(urlRequest: URLRequest, complition: @escaping (Result<Data, Error>) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self = self else {
-                complition(.failure(NetworkError.unknown))
-                return
-            }
-            guard let url = urlRequest.url else {
-                complition(.failure(NetworkError.urlIsMissing))
-                return
-            }
-            if url.absoluteString.hasSuffix("api/login") {
-                if let data = self.loginMineResponse().data(using: .utf8) {
-                    complition(.success(data))
-                    return
-                } else {
-                    complition(.failure(NetworkError.badResponse))
-                    return
-                }
-            }
-            if url.absoluteString.contains("api/schedule") {
-                if let data = self.sheduleMineResponse().data(using: .utf8) {
-                    complition(.success(data))
-                    return
-                } else {
-                    complition(.failure(NetworkError.badResponse))
-                    return
-                }
-            }
-            complition(.failure(NetworkError.notFound))
-        }
-        
-    }
-    
-    func makeRequest(for endpoint: String,baseURL: URL, method: HTTPMethod) -> URLRequest {
-        var request = URLRequest(url: baseURL.appendingPathComponent(endpoint))
-        request.httpMethod = method.rawValue
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("Fake token", forHTTPHeaderField: "Bearer")
-        return request
-    }
-    
     func makeLogIn(complition: @escaping(Result<UserResponse, Error>) -> Void) {
         let request = makeRequest(for: "api/login",
                                   baseURL: self.baseURL,
@@ -100,6 +59,50 @@ class StubNetworkService {
                 complition (.failure(error))
             }
         }
+    }
+    
+    private func request(urlRequest: URLRequest,
+                         complition: @escaping (Result<Data, Error>) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self = self else {
+                complition(.failure(NetworkError.unknown))
+                return
+            }
+            guard let url = urlRequest.url else {
+                complition(.failure(NetworkError.urlIsMissing))
+                return
+            }
+            if url.absoluteString.hasSuffix("api/login") {
+                if let data = self.loginMineResponse().data(using: .utf8) {
+                    complition(.success(data))
+                    return
+                } else {
+                    complition(.failure(NetworkError.badResponse))
+                    return
+                }
+            }
+            if url.absoluteString.contains("api/schedule") {
+                if let data = self.sheduleMineResponse().data(using: .utf8) {
+                    complition(.success(data))
+                    return
+                } else {
+                    complition(.failure(NetworkError.badResponse))
+                    return
+                }
+            }
+            complition(.failure(NetworkError.notFound))
+        }
+        
+    }
+    
+    private func makeRequest(for endpoint: String,
+                             baseURL: URL,
+                             method: HTTPMethod) -> URLRequest {
+        var request = URLRequest(url: baseURL.appendingPathComponent(endpoint))
+        request.httpMethod = method.rawValue
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Fake token", forHTTPHeaderField: "Bearer")
+        return request
     }
     
     private func loginMineResponse() -> String {

@@ -13,11 +13,9 @@ class ViewController: UIViewController {
     //MARK: - Proprties
     
     let networkService = StubNetworkService()
-    let alertTitleText = "Invalid Email"
-    let alertMessageText = "This email address is not available. Choose a different address."
-    let alertActionTitleText = "OK"
     var isChecked = false
     let userDafeult = UserDefaults.standard
+    let keychain = Keychain()
     
     //MARK: - Outlet
     
@@ -57,7 +55,6 @@ class ViewController: UIViewController {
         isChecked = !isChecked
         if isChecked {
             checkedButton.layer.backgroundColor = UIColor.systemGreen.cgColor
-            saveCredential()
         } else {
             checkedButton.layer.backgroundColor = UIColor.white.cgColor
         }
@@ -65,14 +62,13 @@ class ViewController: UIViewController {
     
     @IBAction func loginBtnPressed(_ sender: UIButton) {
         logIn()
-        goToCalendarVC()
     }
     
     //MARK: - Methods
     
     func deleteCredentials() {
         userDafeult.removeObject(forKey: "username")
-        Keychain().deleteCredentials()
+        keychain.deleteCredentials()
     }
     
     func getCredentials() {
@@ -80,7 +76,7 @@ class ViewController: UIViewController {
             print("Failed to read user email from user defaults")
             return
         }
-        guard let data = Keychain().getCredentials(account: userEmail) else {
+        guard let data = keychain.getCredentials(account: userEmail) else {
             print("Failed to read password")
             return
         }
@@ -99,20 +95,13 @@ class ViewController: UIViewController {
         }
         deleteCredentials()
         userDafeult.set(userEmail, forKey: "username")
-        Keychain().saveCredentials(username: userEmail, password: password)
-    }
-    
-    func createAlert() {
-        self.createAlert(alertTitle: alertTitleText,
-                         alertMessage: alertMessageText,
-                         alertActionTitle: alertActionTitleText)
+        keychain.saveCredentials(username: userEmail, password: password)
     }
     
     func goToCalendarVC() {
         let calendarVC = UIStoryboard(name: "Calendar",
                                       bundle: .main)
             .instantiateViewController(withIdentifier: "CalendarViewController") as! CalendarViewController
-        navigationController?.isNavigationBarHidden = true
         navigationController?.pushViewController(calendarVC, animated: true)
     }
     
@@ -120,7 +109,6 @@ class ViewController: UIViewController {
         let email = userEmailTextField.text ?? ""
         let password = userPasswordTextField.text ?? ""
         if email.isEmpty || password.isEmpty || Validate().validateEmailId(emailID: email) == false {
-            createAlert()
             return
         }
         
@@ -128,8 +116,14 @@ class ViewController: UIViewController {
             switch result {
             case .success(let success):
                 print(success)
+                self.goToCalendarVC()
+                if self.isChecked == true {
+                    self.saveCredential()
+                }
             case .failure(let error):
                 print(error)
+                self.createAlert(title: "Invalid Email",
+                                 message: "This email address is not available. Choose a different address.")
             }
         }
     }

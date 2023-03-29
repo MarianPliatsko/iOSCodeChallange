@@ -7,35 +7,20 @@
 
 import Foundation
 
-class UserResponse: Codable {
+struct UserResponse: Decodable {
     let error: ErrorMessage?
     let data: DataClass
-
-    init(error: ErrorMessage?, data: DataClass) {
-        self.error = error
-        self.data = data
-    }
 }
 
-class DataClass: Codable {
+struct DataClass: Decodable {
     let accessToken, refreshToken: String
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
     }
-
-    init(accessToken: String, refreshToken: String) {
-        self.accessToken = accessToken
-        self.refreshToken = refreshToken
-    }
 }
 
-class ErrorMessage: Codable {
+struct ErrorMessage: Decodable {
     let code, message: String
-
-    init(code: String, message: String) {
-        self.code = code
-        self.message = message
-    }
 }

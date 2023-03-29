@@ -75,4 +75,12 @@ class CalendarHelper {
         return monthOfYear
     }
     
+    func dateFromDayMonthYear(day:String, date: Date) -> Date {
+        let year = yearToString(date: date)
+        let month = monthToStringNumber(date: date)
+        var component = calendar.dateComponents([.month, .year], from: date)
+        component.day = Int(day)
+        return calendar.date(from: component) ?? Date()
+    }
+    
 }

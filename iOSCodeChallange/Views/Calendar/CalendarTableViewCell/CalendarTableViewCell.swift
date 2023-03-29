@@ -21,11 +21,6 @@ class CalendarTableViewCell: UITableViewCell {
     
     //MARK: - Life cycle
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
@@ -38,10 +33,16 @@ class CalendarTableViewCell: UITableViewCell {
         return nib
     }
     
-    func setupUI(data: SheduleData) {
-        titleLabel.text = data.courseName
-        detailLabel.text = data.room
-        timeLabel.text = "\(data.startTime) - \(data.emdTime)"
+    func setupUI(data: SheduleData?) {
+        if let data {
+            titleLabel.text = data.courseName
+            detailLabel.text = data.room
+            timeLabel.text = "\(data.startTime) - \(data.emdTime)"
+        }
+        else {
+            timeLabel.text = "No events"
+        }
+        
     }
     
 }
